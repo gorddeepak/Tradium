@@ -46,6 +46,12 @@ app.use("/api/instruments", require("./routes/instrumentRoutes"));
 app.use("/api/market", require("./routes/marketRoutes"));
 app.use("/api/assistant", require("./routes/assistantRoutes"));
 
+// Cheapest possible "is it alive" answer — the keep-alive ping and any uptime
+// monitor hit this; it does no DB or Yahoo work.
+app.get("/api/health", (req, res) => {
+  res.json({ ok: true });
+});
+
 // anything that didn't match a route above
 app.use((req, res) => {
   res.status(404).json({ message: "Route not found" });

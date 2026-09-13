@@ -8,6 +8,7 @@ const { OrdersModel } = require("../models/OrdersModel");
 const { FundsModel } = require("../models/FundsModel");
 const { applyFill, settleMisExit, cancelSiblingExits } = require("../utils/executeOrder");
 const { tickerFor } = require("../utils/symbol");
+const { isMarketOpen } = require("../utils/marketHours");
 
 async function fetchQuote(symbol) {
   const ticker = tickerFor(symbol);
@@ -44,6 +45,10 @@ async function fetchSector(symbol) {
 let isSyncing = false;
 
 async function syncPrices() {
+  // Yahoo quotes don't move while the market is closed, so syncing is wasted
+  // Yahoo calls — skip them. Open limit orders wait for the next open market.
+  if (!isMarketOpen()) return;
+
   if (isSyncing) {
     console.log("Price sync still running, skipping this tick");
     return;
