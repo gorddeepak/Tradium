@@ -131,7 +131,7 @@ export function NovaSection() {
         >
           {/* A real screenshot of the insight card — the live card writes its
              own line from your rows. */}
-          <div className={insightShown ? "animate-rise" : "opacity-0"}>
+          <div className={`order-2 lg:order-none ${insightShown ? "animate-rise" : "opacity-0"}`}>
             {/* Full column width plus a slight bleed into the grid gap —
                 the screenshot is a wide, short banner (750×158), so a little
                 extra width makes it read clearly.
