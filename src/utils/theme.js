@@ -4,11 +4,10 @@
 const STORAGE_KEY = "tradium-theme";
 
 export function initTheme() {
-  // An explicit choice wins; otherwise follow the OS preference.
+  // An explicit choice wins; otherwise light (the landing page doesn't look
+  // good in dark mode, so we don't follow the OS preference).
   const stored = localStorage.getItem(STORAGE_KEY);
-  const dark =
-    stored === "dark" ||
-    (stored === null && window.matchMedia("(prefers-color-scheme: dark)").matches);
+  const dark = stored === "dark";
 
   document.documentElement.classList.toggle("dark", dark);
 }

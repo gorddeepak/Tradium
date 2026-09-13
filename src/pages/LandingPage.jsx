@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import {
   MarketingNav,
   Hero,
@@ -19,6 +20,12 @@ export default function LandingPage() {
     description:
       "A mock NSE trading dashboard: holdings, positions, orders, watchlist, funds and single-stock execution, with an assistant that reads your portfolio. No real money involved.",
   });
+
+  // The landing page only looks right in light mode — turn dark mode off even
+  // if the user switched it on inside the dashboard.
+  useEffect(() => {
+    document.documentElement.classList.remove("dark");
+  }, []);
 
   return (
     <div className="min-h-screen bg-background">
