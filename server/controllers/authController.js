@@ -10,10 +10,9 @@ const isProduction = process.env.NODE_ENV === "production";
 const cookieOptions = {
   httpOnly: true,
   secure: isProduction,
-  // "strict" is safer (blocks CSRF) but browsers won't send strict cookies
-  // across sites (e.g. Netlify frontend + Render backend), so production
-  // needs "none" — which requires secure: true and HTTPS.
-  sameSite: isProduction ? "none" : "strict",
+  // The server serves the frontend itself, so site and API share one origin
+  // and "strict" (the safer setting) works everywhere.
+  sameSite: "strict",
   maxAge: 7 * 24 * 60 * 60 * 1000,
 };
 

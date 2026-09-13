@@ -4,6 +4,7 @@ const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
 const cookieParser = require("cookie-parser");
+const path = require("path");
 
 const PORT = process.env.PORT || 3002;
 const url = process.env.MONGO_URL;
@@ -16,18 +17,17 @@ const { syncPrices } = require("./jobs/priceSync");
 const { recordDailySnapshot } = require("./jobs/portfolioSnapshot");
 const { marketSync } = require("./jobs/marketSync");
 
-// dev origins stay hardcoded; production origin comes from CORS_ORIGIN (e.g. https://tradium.netlify.app)
-const allowedOrigins = [
-  "http://localhost:5173",
-  "http://localhost:5174",
-  "http://localhost:5175",
-  "http://localhost:5176",
-  "http://localhost:5177",
-];
-if (process.env.CORS_ORIGIN) allowedOrigins.push(process.env.CORS_ORIGIN);
-
+// CORS is only needed in dev, where the Vite server (5173-5177) and the API
+// (3002) are different origins. In production the server serves the built
+// frontend itself, so the site and API share one origin.
 app.use(cors({
-  origin: allowedOrigins,
+  origin: [
+    "http://localhost:5173",
+    "http://localhost:5174",
+    "http://localhost:5175",
+    "http://localhost:5176",
+    "http://localhost:5177",
+  ],
   credentials: true,
 }));
 app.use(express.json());
@@ -51,6 +51,17 @@ app.use("/api/assistant", require("./routes/assistantRoutes"));
 app.get("/api/health", (req, res) => {
   res.json({ ok: true });
 });
+
+// In production the server also serves the built frontend from dist/.
+// Unknown non-API paths get index.html so client-side routing works on
+// refresh/deep links; unknown /api paths fall through to the 404 below.
+if (process.env.NODE_ENV === "production") {
+  app.use(express.static(path.join(__dirname, "..", "dist")));
+  app.use((req, res, next) => {
+    if (req.path.startsWith("/api")) return next();
+    res.sendFile(path.join(__dirname, "..", "dist", "index.html"));
+  });
+}
 
 // anything that didn't match a route above
 app.use((req, res) => {
